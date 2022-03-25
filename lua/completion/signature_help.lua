@@ -40,8 +40,8 @@ M.autoOpenSignatureHelp = function()
       local client = vim.lsp.get_client_by_id(client_id)
       local handler = client and client.handlers['textDocument/signatureHelp']
       if handler then
-          handler(...)
-          return
+        handler(...)
+        return
       end
       if not (result and result.signatures and result.signatures[1]) then
         return
@@ -53,18 +53,21 @@ M.autoOpenSignatureHelp = function()
 
       -- if `lines` can be trimmed, it is modified in place
       local trimmed_lines_filetype = vim.lsp.util.try_trim_markdown_code_blocks(lines)
-	  local opts = {}
-	  if vim.g.completion_popup_border then
-	    opts.border = vim.g.completion_popup_border
-	  end
-      local bufnr, _ = vim.lsp.util.open_floating_preview(
-        -- TODO show popup when signatures is empty?
-        vim.lsp.util.trim_empty_lines(lines),
-        trimmed_lines_filetype,
-	opts
-      )
-      -- setup a variable for floating window, fix #223
-      vim.api.nvim_buf_set_var(bufnr, "lsp_floating", true)
+      local opts = {}
+      if vim.g.completion_popup_border then
+        opts.border = vim.g.completion_popup_border
+      end
+
+	  local trimmed_lines = vim.lsp.util.trim_empty_lines(lines)
+      if trimmed_lines[1] ~= '' then
+        local bufnr, _ = vim.lsp.util.open_floating_preview(
+          trimmed_lines,
+          trimmed_lines_filetype,
+          opts
+        )
+        -- setup a variable for floating window, fix #223
+        vim.api.nvim_buf_set_var(bufnr, "lsp_floating", true)
+      end
     end)
   end
 end
