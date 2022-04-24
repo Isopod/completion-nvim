@@ -113,7 +113,7 @@ local function applyAddtionalTextEdits(completed_item)
           function(x) return x.range.start.line ~= (lnum - 1) end,
           item.additionalTextEdits
         )
-        vim.lsp.util.apply_text_edits(edits, bufnr)
+        vim.lsp.util.apply_text_edits(edits, bufnr, "utf-16")
       end
     end
   end
