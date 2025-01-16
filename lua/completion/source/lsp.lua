@@ -74,8 +74,27 @@ local function get_context_aware_snippets(item, completion_item, line_to_cursor)
   end
 end
 
+--- Can be used to extract the completion items from a
+--- `textDocument/completion` request, which may return one of
+--- `CompletionItem[]`, `CompletionList` or null.
+---@param result (table) The result of a `textDocument/completion` request
+---@returns (table) List of completion items
+---@see https://microsoft.github.io/language-server-protocol/specification#textDocument_completion
+local function extract_completion_items(result)
+  if type(result) == 'table' and result.items then
+    -- result is a `CompletionList`
+    return result.items
+  elseif result ~= nil then
+    -- result is `CompletionItem[]`
+    return result
+  else
+    -- result is `null`
+    return {}
+  end
+end
+
 local function text_document_completion_list_to_complete_items(result, params)
-  local items = vim.lsp.util.extract_completion_items(result)
+  local items = extract_completion_items(result)
   if vim.tbl_isempty(items) then
     return {}
   end
