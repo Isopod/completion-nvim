@@ -19,6 +19,16 @@ local function sort_completion_items(items)
   end)
 end
 
+
+---@param input string unparsed snippet
+---@return string parsed snippet
+local function parse_snippet(input)
+  local ok, parsed = pcall(function()
+    return require('vim.lsp._snippet_grammar').parse(input)
+  end)
+  return ok and tostring(parsed) or input
+end
+
 local function get_completion_word(item, prefix, suffix)
   if item.textEdit ~= nil and item.textEdit ~= vim.NIL
     and item.textEdit.newText ~= nil and (item.insertTextFormat ~= 2 or vim.fn.exists('g:loaded_vsnip_integ')) then
@@ -35,7 +45,7 @@ local function get_completion_word(item, prefix, suffix)
     or opt.get_option('enable_snippet') == "snippets.nvim" then
       return newText
     else
-      return vim.lsp.util.parse_snippet(newText)
+      return parse_snippet(newText)
     end
   elseif item.insertText ~= nil and item.insertText ~= vim.NIL then
     if not item.insertTextFormat
@@ -43,7 +53,7 @@ local function get_completion_word(item, prefix, suffix)
     or opt.get_option('enable_snippet') == "snippets.nvim" then
       return item.insertText
     else
-      return vim.lsp.util.parse_snippet(item.insertText)
+      return parse_snippet(item.insertText)
     end
   end
   return item.label

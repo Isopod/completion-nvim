@@ -13,76 +13,76 @@ local M = {}
 --                          external commands                         --
 ------------------------------------------------------------------------
 
-M.insertCompletionItems = function(completed_items, prefix, item)
-  match.matching(completed_items, prefix, item)
-end
+--M.insertCompletionItems = function(completed_items, prefix, item)
+--  match.matching(completed_items, prefix, item)
+--end
+--
+--M.addCompletionSource = function(key, completed_item)
+--  source.addCompleteItems(key, completed_item)
+--end
 
-M.addCompletionSource = function(key, completed_item)
-  source.addCompleteItems(key, completed_item)
-end
-
-M.nextSource = function()
-  source.nextCompletion()
-end
-
-M.prevSource = function()
-  source.prevCompletion()
-end
+--M.nextSource = function()
+--  source.nextCompletion()
+--end
+--
+--M.prevSource = function()
+--  source.prevCompletion()
+--end
 
 M.triggerCompletion = function()
   source.triggerCompletion(true, manager)
 end
-
-M.completionToggle = function()
-  local enable = vim.b.completion_enable
-  if enable == nil then
-    M.on_attach()
-  elseif enable == 0 then
-    vim.b.completion_enable = 1
-  else
-    vim.b.completion_enable = 0
-  end
-end
+--
+--M.completionToggle = function()
+--  local enable = vim.b.completion_enable
+--  if enable == nil then
+--    M.on_attach()
+--  elseif enable == 0 then
+--    vim.b.completion_enable = 1
+--  else
+--    vim.b.completion_enable = 0
+--  end
+--end
 
 ------------------------------------------------------------------------
 --                         smart tab                                  --
 ------------------------------------------------------------------------
 
-function M.smart_tab()
-  if vim.fn.pumvisible() ~= 0 then
-    api.nvim_eval([[feedkeys("\<c-n>", "n")]])
-    return
-  end
-
-  local col = vim.fn.col('.') - 1
-  if col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
-    api.nvim_eval([[feedkeys("\<tab>", "n")]])
-    return
-  end
-
-  source.triggerCompletion(true, manager)
-end
-
-function M.smart_s_tab()
-  if vim.fn.pumvisible() ~= 0 then
-    api.nvim_eval([[feedkeys("\<c-p>", "n")]])
-    return
-  end
-
-  api.nvim_eval([[feedkeys("\<s-tab>", "n")]])
-end
+--function M.smart_tab()
+--  if vim.fn.pumvisible() ~= 0 then
+--    api.nvim_eval([[feedkeys("\<c-n>", "n")]])
+--    return
+--  end
+--
+--  local col = vim.fn.col('.') - 1
+--  if col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
+--    api.nvim_eval([[feedkeys("\<tab>", "n")]])
+--    return
+--  end
+--
+--  source.triggerCompletion(true, manager)
+--end
+--
+--function M.smart_s_tab()
+--  if vim.fn.pumvisible() ~= 0 then
+--    api.nvim_eval([[feedkeys("\<c-p>", "n")]])
+--    return
+--  end
+--
+--  api.nvim_eval([[feedkeys("\<s-tab>", "n")]])
+--end
 
 ------------------------------------------------------------------------
 --                         confirm completion                         --
 ------------------------------------------------------------------------
 
 -- I want to deprecate this...
-local function autoAddParens(completed_item)
-  if completed_item.kind == nil then return end
-  if string.match(completed_item.kind, '.*Function.*') ~= nil or string.match(completed_item.kind, '.*Method.*') then
-    api.nvim_input("()<left>")
-  end
-end
+--local function autoAddParens(completed_item)
+--  if completed_item.kind == nil then return end
+--  if string.match(completed_item.kind, '.*Function.*') ~= nil or string.match(completed_item.kind, '.*Method.*') then
+--    api.nvim_input("()<left>")
+--  end
+--end
 
 -- Workaround to avoid expand snippets when not confirm
 -- confirmCompletion is now triggered by CompleteDone autocmd to solve issue with noselect
@@ -125,45 +125,45 @@ local function hasConfirmedCompletion()
   if completed_item.user_data == nil then return end
   if completed_item.user_data.lsp ~= nil then
     applyAddtionalTextEdits(completed_item)
-    if opt.get_option('enable_snippet') == "snippets.nvim" then
-      require 'snippets'.expand_at_cursor(completed_item.user_data.actual_item, completed_item.word)
-    end
+    --if opt.get_option('enable_snippet') == "snippets.nvim" then
+    --  require 'snippets'.expand_at_cursor(completed_item.user_data.actual_item, completed_item.word)
+    --end
   end
-  if opt.get_option('enable_auto_paren') == 1 then
-    autoAddParens(completed_item)
-  end
-  if completed_item.user_data.snippet_source == 'UltiSnips' then
-    api.nvim_call_function('UltiSnips#ExpandSnippet', {})
-  elseif completed_item.user_data.snippet_source == 'Neosnippet' then
-    api.nvim_input("<c-r>".."=neosnippet#expand('"..completed_item.word.."')".."<CR>")
-  elseif completed_item.user_data.snippet_source == 'vim-vsnip' then
-    api.nvim_call_function('vsnip#anonymous', {
-      table.concat(completed_item.user_data.snippet_body, "\n"),
-      {
-        prefix = completed_item.word
-      }
-    })
-  elseif completed_item.user_data.snippet_source == 'snippets.nvim' then
-    require'snippets'.expand_at_cursor()
-  end
+  --if opt.get_option('enable_auto_paren') == 1 then
+  --  autoAddParens(completed_item)
+  --end
+  --if completed_item.user_data.snippet_source == 'UltiSnips' then
+  --  api.nvim_call_function('UltiSnips#ExpandSnippet', {})
+  --elseif completed_item.user_data.snippet_source == 'Neosnippet' then
+  --  api.nvim_input("<c-r>".."=neosnippet#expand('"..completed_item.word.."')".."<CR>")
+  --elseif completed_item.user_data.snippet_source == 'vim-vsnip' then
+  --  api.nvim_call_function('vsnip#anonymous', {
+  --    table.concat(completed_item.user_data.snippet_body, "\n"),
+  --    {
+  --      prefix = completed_item.word
+  --    }
+  --  })
+  --elseif completed_item.user_data.snippet_source == 'snippets.nvim' then
+  --  require'snippets'.expand_at_cursor()
+  --end
 end
 
 ------------------------------------------------------------------------
 --                            autocommands                            --
 ------------------------------------------------------------------------
 
-function M.on_InsertCharPre()
+function M.on_InsertCharPre(args)
   manager.insertChar = true
   manager.textHover = true
   manager.selected = -1
 end
 
-function M.on_InsertLeave()
+function M.on_InsertLeave(args)
   manager.insertLeave = true
 end
 
 -- TODO: need further refactor, very messy now:(
-function M.on_InsertEnter()
+function M.on_InsertEnter(args)
   local enable = vim.b.completion_enable
   if enable == nil or enable == 0 then
     return
@@ -229,7 +229,7 @@ function M.on_InsertEnter()
 end
 
 -- handle completion confirmation and dismiss hover popup
-function M.on_CompleteDone()
+function M.on_CompleteDone(args)
   if manager.confirmedCompletion then
     manager.confirmedCompletion = false
     hasConfirmedCompletion()
@@ -243,32 +243,58 @@ function M.on_CompleteDone()
   end
 end
 
-M.on_attach = function(option)
+
+local augroup = api.nvim_create_augroup("CompletionCommand", {})
+
+M.on_attach = function(client, bufnr)
   -- setup completion_option tables
-  opt.set_option_table(option)
-  local disable_filetypes = opt.get_option("disable_filetypes")
-  local ft = vim.bo.filetype
-  for _, disable_ft in ipairs(disable_filetypes) do
-    if ft == disable_ft then
-      return
-    end
-  end
+  --opt.set_option_table(option)
+  --local disable_filetypes = opt.get_option("disable_filetypes")
+  --local ft = vim.bo.filetype
+  --for _, disable_ft in ipairs(disable_filetypes) do
+  --  if ft == disable_ft then
+  --    return
+  --  end
+  --end
   -- setup autocommand
   -- TODO: Modified this if lua callbacks for autocmd is merged
-  api.nvim_command("augroup CompletionCommand")
-    api.nvim_command("autocmd! * <buffer>")
-    api.nvim_command("autocmd InsertEnter <buffer> lua require'completion'.on_InsertEnter()")
-    api.nvim_command("autocmd InsertLeave <buffer> lua require'completion'.on_InsertLeave()")
-    api.nvim_command("autocmd InsertCharPre <buffer> lua require'completion'.on_InsertCharPre()")
-    api.nvim_command("autocmd CompleteDone <buffer> lua require'completion'.on_CompleteDone()")
-  api.nvim_command("augroup end")
+  --api.nvim_command("augroup CompletionCommand")
+  --  api.nvim_command("autocmd! * <buffer>")
+  --  api.nvim_command("autocmd InsertEnter <buffer> lua require'completion'.on_InsertEnter()")
+  --  api.nvim_command("autocmd InsertLeave <buffer> lua require'completion'.on_InsertLeave()")
+  --  api.nvim_command("autocmd InsertCharPre <buffer> lua require'completion'.on_InsertCharPre()")
+  --  api.nvim_command("autocmd CompleteDone <buffer> lua require'completion'.on_CompleteDone()")
+  --api.nvim_command("augroup end")
+
+  api.nvim_create_autocmd("InsertEnter", {
+    callback = M.on_InsertEnter,
+    group = augroup,
+    buffer = bufnr,
+  })
+  api.nvim_create_autocmd("InsertLeave", {
+    callback = M.on_InsertLeave,
+    group = augroup,
+    buffer = bufnr,
+  })
+  api.nvim_create_autocmd("InsertCharPre", {
+    callback = M.on_InsertCharPre,
+    group = augroup,
+    buffer = bufnr,
+  })
+  api.nvim_create_autocmd("CompleteDone", {
+    callback = M.on_CompleteDone,
+    group = augroup,
+    buffer = bufnr,
+  })
+
   if string.len(opt.get_option('confirm_key')) ~= 0 then
-    api.nvim_buf_set_keymap(0, 'i', opt.get_option('confirm_key'),
+    api.nvim_buf_set_keymap(bufnr, 'i', opt.get_option('confirm_key'),
       'pumvisible() ? complete_info()["selected"] != "-1" ? "\\<Plug>(completion_confirm_completion)" :'..
       ' "\\<c-e>\\<CR>" : "\\<CR>"',
       {silent=false, noremap=false, expr=true})
   end
-  vim.b.completion_enable = 1
+
+  vim.b[bufnr].completion_enable = 1
 end
 
 return M

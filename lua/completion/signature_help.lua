@@ -7,7 +7,7 @@ local M = {}
 ----------------------
 --  signature help  --
 ----------------------
-M.autoOpenSignatureHelp = function()
+M.autoOpenSignatureHelp = function(args)
   local pos = api.nvim_win_get_cursor(0)
   local line = api.nvim_get_current_line()
   local line_to_cursor = line:sub(1, pos[2])
